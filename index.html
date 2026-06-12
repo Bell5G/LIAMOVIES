@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LiaMovies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #15110f;
+    --bg-elevated: #1f1916;
+    --bg-card: #221b18;
+    --film: #e8b14a;
+    --film-dim: #a37c33;
+    --cream: #f3ecdf;
+    --muted: #b8a99a;
+    --line: #3a2f29;
+    --focus: #e8b14a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(232,177,74,0.06), transparent 40%),
+      radial-gradient(circle at 85% 20%, rgba(232,177,74,0.04), transparent 35%);
+    color: var(--cream);
+    font-family: "Karla", -apple-system, sans-serif;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ============ HEADER ============ */
+  header {
+    padding: 40px 32px 24px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(180deg, var(--bg) 60%, rgba(21,17,15,0));
+    backdrop-filter: blur(8px);
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .brand h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 40px;
+    letter-spacing: 0.5px;
+    color: var(--cream);
+    position: relative;
+  }
+
+  .brand h1 .accent {
+    color: var(--film);
+    font-style: italic;
+  }
+
+  .brand .ticket {
+    font-family: "Karla", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--film);
+    padding: 4px 10px;
+    border-radius: 3px;
+    transform: rotate(-2deg);
+    white-space: nowrap;
+  }
+
+  header p.tagline {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+    font-family: "Fraunces", serif;
+  }
+
+  /* ============ CONTROLS ============ */
+  .controls {
+    display: flex;
+    gap: 12px;
+    padding: 0 32px 8px 32px;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 220px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    stroke: var(--muted);
+    pointer-events: none;
+  }
+
+  .controls input, .controls select {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    color: var(--cream);
+    padding: 11px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: "Karla", sans-serif;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .controls input { width: 100%; padding-left: 38px; }
+
+  .controls input::placeholder { color: var(--muted); }
+
+  .controls input:focus, .controls select:focus {
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px rgba(232,177,74,0.15);
+  }
+
+  .controls select { cursor: pointer; min-width: 190px; }
+
+  /* ============ STATUS ============ */
+  .status {
+    padding: 4px 32px 20px 32px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ============ GRID ============ */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 22px;
+    padding: 0 32px 64px 32px;
+  }
+
+  .card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    outline: none;
+    border-radius: 6px;
+  }
+
+  .card:focus-visible {
+    box-shadow: 0 0 0 3px var(--focus);
+  }
+
+  .card .thumb {
+    width: 100%;
+    aspect-ratio: 2/3;
+    background: var(--bg-card);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--line);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .card:hover .thumb, .card:focus-visible .thumb {
+    transform: translateY(-6px);
+    border-color: var(--film-dim);
+    box-shadow: 0 16px 32px -12px rgba(0,0,0,0.6);
+  }
+
+  .card .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .card .thumb .placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      repeating-linear-gradient(135deg, rgba(232,177,74,0.04) 0px, rgba(232,177,74,0.04) 2px, transparent 2px, transparent 14px);
+  }
+
+  .card .thumb .placeholder svg {
+    width: 36px;
+    height: 36px;
+    stroke: var(--film-dim);
+    stroke-width: 1.4;
+  }
+
+  .card .thumb .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(21,17,15,0.0);
+    opacity: 0;
+    transition: opacity 0.25s ease, background 0.25s ease;
+  }
+
+  .card:hover .play-overlay, .card:focus-visible .play-overlay {
+    opacity: 1;
+    background: rgba(21,17,15,0.35);
+  }
+
+  .play-overlay .play-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--film);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0.85);
+    transition: transform 0.25s ease;
+  }
+
+  .card:hover .play-circle, .card:focus-visible .play-circle {
+    transform: scale(1);
+  }
+
+  .play-circle svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--bg);
+    stroke: none;
+    margin-left: 2px;
+  }
+
+  .card .info .title {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--cream);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+  }
+
+  .card:hover .info .title, .card:focus-visible .info .title {
+    color: var(--film);
+  }
+
+  .card .info .meta {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ============ EMPTY STATE ============ */
+  .empty-state {
+    padding: 80px 32px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty-state .stub {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    border: 2px dashed var(--line);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .empty-state .stub svg {
+    width: 24px; height: 24px;
+    stroke: var(--film-dim);
+  }
+  .empty-state p.lead {
+    font-family: "Fraunces", serif;
+    font-size: 18px;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+  .empty-state p.sub {
+    font-size: 13px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,8,6,0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 920px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px -16px rgba(0,0,0,0.7);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .modal-header h2 {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--cream);
+    padding-right: 16px;
+  }
+
+  .modal-header button {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .modal-header button:hover {
+    color: var(--film);
+    border-color: var(--film-dim);
+  }
+
+  .modal-body {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+  }
+  .modal-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 560px) {
+    header { padding: 28px 18px 16px 18px; }
+    .brand h1 { font-size: 30px; }
+    .controls, .status, .grid { padding-left: 18px; padding-right: 18px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Lia<span class="accent">Movies</span></h1>
+    <span class="ticket">Funcion continua</span>
+  </div>
+  <p class="tagline">Peliculas Favoritas de mi araraws</p>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="Buscar en la cartelera..." />
+  </div>
+  <select id="sortSelect">
+    <option value="default">Orden: como las agregue</option>
+    <option value="name">Orden: titulo (A-Z)</option>
+    <option value="name-desc">Orden: titulo (Z-A)</option>
+  </select>
+</div>
+
+<div id="status" class="status"></div>
+<div id="grid" class="grid"></div>
+
+<!-- Modal de reproduccion -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Titulo</h2>
+      <button id="modalClose" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="modal-body">
+      <iframe id="modalIframe" src="" allow="autoplay; fullscreen" allowfullscreen title="Reproductor de pelicula"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ======================================================================
+  //  TU CARTELERA - Edita esta lista para agregar o quitar peliculas
+  // ======================================================================
+  //
+  //  Para cada pelicula necesitas el ID del archivo de Google Drive.
+  //  Lo sacas del enlace para compartir, que se ve asi:
+  //
+  //  https://drive.google.com/file/d/AQUI_VA_EL_ID/view?usp=sharing
+  //                                   ^^^^^^^^^^^^^
+  //                                   esa parte es el "id"
+  //
+  //  "subtitulo" es opcional (ej: año, genero). Si no quieres, deja "".
+  // ======================================================================
+
+  const PELICULAS = [
+    {
+      titulo: "Aquamarine",
+      subtitulo: "2006",
+      id: "1LPI58Xw9w4xvyGcRennzUrpGhkoyr0aa"
+    }
+  ];
+
+  // ======================================================================
+  //  No es necesario editar nada debajo de esta linea
+  // ======================================================================
+
+  const gridEl = document.getElementById("grid");
+  const statusEl = document.getElementById("status");
+  const searchInput = document.getElementById("searchInput");
+  const sortSelect = document.getElementById("sortSelect");
+  const modalOverlay = document.getElementById("modalOverlay");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalIframe = document.getElementById("modalIframe");
+  const modalClose = document.getElementById("modalClose");
+
+  function filmIconSvg() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="3" width="20" height="18" rx="2"/>
+      <line x1="7" y1="3" x2="7" y2="21"/>
+      <line x1="17" y1="3" x2="17" y2="21"/>
+      <line x1="2" y1="8" x2="7" y2="8"/>
+      <line x1="2" y1="14" x2="7" y2="14"/>
+      <line x1="17" y1="8" x2="22" y2="8"/>
+      <line x1="17" y1="14" x2="22" y2="14"/>
+    </svg>`;
+  }
+
+  function playIconSvg() {
+    return `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+  }
+
+  function emptyIconSvg() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>
+    </svg>`;
+  }
+
+  function thumbUrl(file) {
+    // Miniatura automatica que genera Google Drive para el archivo
+    return `https://drive.google.com/thumbnail?id=${file.id}&sz=w400`;
+  }
+
+  function renderGrid(files) {
+    gridEl.innerHTML = "";
+
+    if (files.length === 0) {
+      gridEl.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="stub">${emptyIconSvg()}</div>
+          <p class="lead">No hay funciones para esa busqueda</p>
+          <p class="sub">Proba con otro titulo.</p>
+        </div>`;
+      return;
+    }
+
+    files.forEach(file => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", `Reproducir ${file.titulo}`);
+
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+
+      const overlay = document.createElement("div");
+      overlay.className = "play-overlay";
+      overlay.innerHTML = `<div class="play-circle">${playIconSvg()}</div>`;
+
+      const img = document.createElement("img");
+      img.src = thumbUrl(file);
+      img.alt = "";
+      img.loading = "lazy";
+      img.onerror = function () {
+        thumb.innerHTML = `<div class="placeholder">${filmIconSvg()}</div>`;
+        thumb.appendChild(overlay);
+      };
+      thumb.appendChild(img);
+      thumb.appendChild(overlay);
+
+      const info = document.createElement("div");
+      info.className = "info";
+      const title = document.createElement("div");
+      title.className = "title";
+      title.textContent = file.titulo;
+      info.appendChild(title);
+
+      if (file.subtitulo) {
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = file.subtitulo;
+        info.appendChild(meta);
+      }
+
+      card.appendChild(thumb);
+      card.appendChild(info);
+
+      card.addEventListener("click", () => openModal(file));
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModal(file);
+        }
+      });
+
+      gridEl.appendChild(card);
+    });
+  }
+
+  function applyFiltersAndSort() {
+    let result = [...PELICULAS];
+
+    const query = searchInput.value.trim().toLowerCase();
+    if (query) {
+      result = result.filter(f => f.titulo.toLowerCase().includes(query));
+    }
+
+    const sortBy = sortSelect.value;
+    if (sortBy === "name") {
+      result.sort((a, b) => a.titulo.localeCompare(b.titulo));
+    } else if (sortBy === "name-desc") {
+      result.sort((a, b) => b.titulo.localeCompare(a.titulo));
+    }
+
+    renderGrid(result);
+  }
+
+  function openModal(file) {
+    modalTitle.textContent = file.titulo;
+    modalIframe.src = `https://drive.google.com/file/d/${file.id}/preview`;
+    modalOverlay.classList.add("open");
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove("open");
+    modalIframe.src = "";
+  }
+
+  modalClose.addEventListener("click", closeModal);
+  modalOverlay.addEventListener("click", (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modalOverlay.classList.contains("open")) closeModal();
+  });
+
+  searchInput.addEventListener("input", applyFiltersAndSort);
+  sortSelect.addEventListener("change", applyFiltersAndSort);
+
+  const plural = PELICULAS.length === 1 ? "pelicula en cartelera" : "peliculas en cartelera";
+  statusEl.textContent = `${PELICULAS.length} ${plural}`;
+
+  applyFiltersAndSort();
+</script>
+
+</body>
+</html>
