@@ -301,7 +301,7 @@
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(10,8,6,0.88);
+    background: rgba(10,8,6,0.92);
     display: none;
     align-items: center;
     justify-content: center;
@@ -339,24 +339,40 @@
     font-size: 18px;
     color: var(--cream);
     padding-right: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .modal-header .modal-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
   }
 
   .modal-header button {
     background: none;
     border: 1px solid var(--line);
     color: var(--muted);
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 6px;
     font-size: 18px;
     cursor: pointer;
     line-height: 1;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: color 0.15s ease, border-color 0.15s ease;
   }
-  .modal-header button:hover {
+  .modal-header button:hover, .modal-header button:focus-visible {
     color: var(--film);
     border-color: var(--film-dim);
+  }
+  .modal-header button svg {
+    width: 17px;
+    height: 17px;
   }
 
   .modal-body {
@@ -369,6 +385,37 @@
     width: 100%;
     height: 100%;
     border: none;
+    display: block;
+  }
+
+  /* En pantallas pequenas, la pelicula ocupa toda la pantalla */
+  @media (max-width: 720px) {
+    .modal-overlay {
+      padding: 0;
+    }
+    .modal {
+      max-width: 100%;
+      height: 100%;
+      border-radius: 0;
+      border: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      padding: 14px 16px;
+    }
+    .modal-body {
+      flex: 1;
+      aspect-ratio: auto;
+      height: auto;
+    }
+  }
+
+  /* Cuando el iframe esta en fullscreen nativo */
+  .modal-body:fullscreen,
+  .modal-body iframe:fullscreen {
+    width: 100vw;
+    height: 100vh;
   }
 
   /* ============ RESPONSIVE ============ */
@@ -417,9 +464,14 @@
   <div class="modal">
     <div class="modal-header">
       <h2 id="modalTitle">Titulo</h2>
-      <button id="modalClose" aria-label="Cerrar">&times;</button>
+      <div class="modal-actions">
+        <button id="modalFullscreen" aria-label="Pantalla completa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+        <button id="modalClose" aria-label="Cerrar">&times;</button>
+      </div>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" id="modalBody">
       <iframe id="modalIframe" src="" allow="autoplay; fullscreen" allowfullscreen title="Reproductor de pelicula"></iframe>
     </div>
   </div>
@@ -459,7 +511,9 @@
   const modalOverlay = document.getElementById("modalOverlay");
   const modalTitle = document.getElementById("modalTitle");
   const modalIframe = document.getElementById("modalIframe");
+  const modalBody = document.getElementById("modalBody");
   const modalClose = document.getElementById("modalClose");
+  const modalFullscreen = document.getElementById("modalFullscreen");
 
   function filmIconSvg() {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -484,8 +538,8 @@
   }
 
   function thumbUrl(file) {
-    // Miniatura automatica que genera Google Drive para el archivo
-    return `https://drive.google.com/thumbnail?id=${file.id}&sz=w400`;
+    // Miniatura automatica de Google Drive en mayor resolucion
+    return `https://drive.google.com/thumbnail?id=${file.id}&sz=w800`;
   }
 
   function renderGrid(files) {
@@ -585,6 +639,13 @@
   }
 
   modalClose.addEventListener("click", closeModal);
+  modalFullscreen.addEventListener("click", () => {
+    if (modalBody.requestFullscreen) {
+      modalBody.requestFullscreen();
+    } else if (modalBody.webkitRequestFullscreen) {
+      modalBody.webkitRequestFullscreen();
+    }
+  });
   modalOverlay.addEventListener("click", (e) => {
     if (e.target === modalOverlay) closeModal();
   });
