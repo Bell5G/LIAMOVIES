@@ -378,15 +378,176 @@
   .modal-body {
     position: relative;
     width: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-body video {
+    width: 100%;
     aspect-ratio: 16/9;
+    display: block;
     background: #000;
   }
-  .modal-body iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
+
+  .video-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+    padding: 24px;
+    background: #000;
   }
+  .video-error p {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 360px;
+  }
+  .video-error a {
+    color: var(--bg);
+    background: var(--film);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px 18px;
+    border-radius: 6px;
+  }
+
+  /* ============ TRACK CONTROLS (audio / subtitulos) ============ */
+  .track-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 14px 22px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--line);
+  }
+
+  .track-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .track-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .track-buttons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .track-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-family: "Karla", sans-serif;
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+
+  .track-btn:hover {
+    border-color: var(--film-dim);
+    color: var(--cream);
+  }
+
+  .track-btn.active {
+    background: var(--film);
+    border-color: var(--film);
+    color: var(--bg);
+    font-weight: 700;
+  }
+
+  .track-empty {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ============ API KEY MODAL ============ */
+  .apikey-modal {
+    max-width: 460px;
+  }
+
+  .apikey-body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .apikey-body p {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .apikey-body input {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    color: var(--cream);
+    padding: 11px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: "Karla", sans-serif;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s ease;
+  }
+
+  .apikey-body input:focus {
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px rgba(232,177,74,0.15);
+  }
+
+  .apikey-error {
+    font-size: 12.5px;
+    color: #e0735c;
+    display: none;
+  }
+
+  .apikey-btn {
+    background: var(--film);
+    color: var(--bg);
+    border: none;
+    font-family: "Karla", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 11px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .apikey-btn:hover {
+    opacity: 0.88;
+  }
+
+  .apikey-link {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 12.5px;
+    text-decoration: underline;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+  }
+  .apikey-link:hover { color: var(--film); }
 
   /* En pantallas pequenas, la pelicula ocupa toda la pantalla */
   @media (max-width: 720px) {
@@ -406,14 +567,18 @@
     }
     .modal-body {
       flex: 1;
-      aspect-ratio: auto;
       height: auto;
+    }
+    .modal-body video {
+      aspect-ratio: auto;
+      flex: 1;
+      min-height: 0;
     }
   }
 
-  /* Cuando el iframe esta en fullscreen nativo */
+  /* Cuando el video esta en fullscreen nativo */
   .modal-body:fullscreen,
-  .modal-body iframe:fullscreen {
+  .modal-body video:fullscreen {
     width: 100vw;
     height: 100vh;
   }
@@ -442,6 +607,7 @@
     <span class="ticket">Funcion continua</span>
   </div>
   <p class="tagline">Peliculas Favoritas de mi araraws</p>
+  <button id="changeApiKeyBtn" class="apikey-link" style="margin-top:8px;">⚙️ Cambiar API Key</button>
 </header>
 
 <div class="controls">
@@ -459,6 +625,21 @@
 <div id="status" class="status"></div>
 <div id="grid" class="grid"></div>
 
+<!-- Modal: pedir API Key (solo aparece la primera vez) -->
+<div class="modal-overlay" id="apiKeyOverlay">
+  <div class="modal apikey-modal">
+    <div class="modal-header">
+      <h2>Conecta tu API Key de Google</h2>
+    </div>
+    <div class="apikey-body">
+      <p>Para reproducir con selector de audio y subtitulos, LiaMovies necesita tu API Key de Google Drive. Se guarda solo en este navegador, nunca se sube a ningun lado.</p>
+      <input type="password" id="apiKeyInput" placeholder="Pega aqui tu API Key (AIza...)" autocomplete="off" />
+      <div id="apiKeyError" class="apikey-error"></div>
+      <button id="apiKeySave" class="apikey-btn">Guardar y continuar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal de reproduccion -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
@@ -472,7 +653,21 @@
       </div>
     </div>
     <div class="modal-body" id="modalBody">
-      <iframe id="modalIframe" src="" allow="autoplay; fullscreen" allowfullscreen title="Reproductor de pelicula"></iframe>
+      <video id="videoPlayer" controls playsinline></video>
+      <div class="track-controls" id="trackControls">
+        <div class="track-group">
+          <span class="track-label">🔊 Audio</span>
+          <div id="audioTrackButtons" class="track-buttons"></div>
+        </div>
+        <div class="track-group">
+          <span class="track-label">💬 Subtitulos</span>
+          <div id="subtitleTrackButtons" class="track-buttons"></div>
+        </div>
+      </div>
+      <div id="videoError" class="video-error" style="display:none;">
+        <p>No se pudo cargar este video directamente (puede ser un .mkv no compatible con tu navegador).</p>
+        <a id="videoErrorLink" href="#" target="_blank">Abrir en Google Drive</a>
+      </div>
     </div>
   </div>
 </div>
@@ -529,10 +724,52 @@
   const sortSelect = document.getElementById("sortSelect");
   const modalOverlay = document.getElementById("modalOverlay");
   const modalTitle = document.getElementById("modalTitle");
-  const modalIframe = document.getElementById("modalIframe");
   const modalBody = document.getElementById("modalBody");
   const modalClose = document.getElementById("modalClose");
   const modalFullscreen = document.getElementById("modalFullscreen");
+  const videoPlayer = document.getElementById("videoPlayer");
+  const videoError = document.getElementById("videoError");
+  const videoErrorLink = document.getElementById("videoErrorLink");
+  const audioTrackButtons = document.getElementById("audioTrackButtons");
+  const subtitleTrackButtons = document.getElementById("subtitleTrackButtons");
+
+  const apiKeyOverlay = document.getElementById("apiKeyOverlay");
+  const apiKeyInput = document.getElementById("apiKeyInput");
+  const apiKeySave = document.getElementById("apiKeySave");
+  const apiKeyError = document.getElementById("apiKeyError");
+
+  // ============ API KEY: guardar / leer del navegador ============
+  function getApiKey() {
+    return localStorage.getItem("liamovies_api_key") || "";
+  }
+  function setApiKey(key) {
+    localStorage.setItem("liamovies_api_key", key);
+  }
+
+  function showApiKeyModal() {
+    apiKeyInput.value = getApiKey();
+    apiKeyError.style.display = "none";
+    apiKeyOverlay.classList.add("open");
+  }
+  function hideApiKeyModal() {
+    apiKeyOverlay.classList.remove("open");
+  }
+
+  apiKeySave.addEventListener("click", () => {
+    const val = apiKeyInput.value.trim();
+    if (!val) {
+      apiKeyError.textContent = "Pega tu API Key para continuar.";
+      apiKeyError.style.display = "block";
+      return;
+    }
+    setApiKey(val);
+    hideApiKeyModal();
+  });
+  apiKeyInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") apiKeySave.click();
+  });
+
+  document.getElementById("changeApiKeyBtn").addEventListener("click", showApiKeyModal);
 
   function filmIconSvg() {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -542,6 +779,7 @@
       <line x1="2" y1="8" x2="7" y2="8"/>
       <line x1="2" y1="14" x2="7" y2="14"/>
       <line x1="17" y1="8" x2="22" y2="8"/>
+
       <line x1="17" y1="14" x2="22" y2="14"/>
     </svg>`;
   }
@@ -648,15 +886,125 @@
     renderGrid(result);
   }
 
+  function streamUrl(fileId) {
+    const key = getApiKey();
+    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${key}`;
+  }
+
+  function driveViewUrl(fileId) {
+    return `https://drive.google.com/file/d/${fileId}/view`;
+  }
+
+  function clearTrackButtons() {
+    audioTrackButtons.innerHTML = "";
+    subtitleTrackButtons.innerHTML = "";
+  }
+
+  // Construye los botones de audio/subtitulos a partir de las pistas
+  // que el propio navegador detecto dentro del archivo .mkv/.mp4
+  function buildTrackButtons() {
+    clearTrackButtons();
+
+    // --- Pistas de AUDIO ---
+    const audioTracks = videoPlayer.audioTracks;
+    if (audioTracks && audioTracks.length > 1) {
+      for (let i = 0; i < audioTracks.length; i++) {
+        const t = audioTracks[i];
+        const btn = document.createElement("button");
+        btn.className = "track-btn" + (t.enabled ? " active" : "");
+        btn.textContent = t.label || t.language || `Pista ${i + 1}`;
+        btn.addEventListener("click", () => {
+          for (let j = 0; j < audioTracks.length; j++) {
+            audioTracks[j].enabled = (j === i);
+          }
+          Array.from(audioTrackButtons.children).forEach((b, idx) => {
+            b.classList.toggle("active", idx === i);
+          });
+        });
+        audioTrackButtons.appendChild(btn);
+      }
+    } else {
+      audioTrackButtons.innerHTML = `<span class="track-empty">Tu navegador no expone varias pistas de audio para este archivo</span>`;
+    }
+
+    // --- Pistas de SUBTITULOS ---
+    const textTracks = videoPlayer.textTracks;
+    if (textTracks && textTracks.length > 0) {
+      const offBtn = document.createElement("button");
+      offBtn.className = "track-btn active";
+      offBtn.textContent = "Desactivados";
+      offBtn.addEventListener("click", () => {
+        for (let i = 0; i < textTracks.length; i++) textTracks[i].mode = "disabled";
+        Array.from(subtitleTrackButtons.children).forEach(b => b.classList.remove("active"));
+        offBtn.classList.add("active");
+      });
+      subtitleTrackButtons.appendChild(offBtn);
+
+      for (let i = 0; i < textTracks.length; i++) {
+        const t = textTracks[i];
+        t.mode = "disabled";
+        const btn = document.createElement("button");
+        btn.className = "track-btn";
+        btn.textContent = t.label || t.language || `Subtitulo ${i + 1}`;
+        btn.addEventListener("click", () => {
+          for (let j = 0; j < textTracks.length; j++) {
+            textTracks[j].mode = (j === i) ? "showing" : "disabled";
+          }
+          Array.from(subtitleTrackButtons.children).forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+        });
+        subtitleTrackButtons.appendChild(btn);
+      }
+    } else {
+      subtitleTrackButtons.innerHTML = `<span class="track-empty">Tu navegador no expone subtitulos para este archivo</span>`;
+    }
+  }
+
   function openModal(file) {
+    if (!getApiKey()) {
+      showApiKeyModal();
+      pendingFile = file;
+      return;
+    }
+
     modalTitle.textContent = file.titulo;
-    modalIframe.src = `https://drive.google.com/file/d/${file.id}/preview`;
+    videoError.style.display = "none";
+    videoPlayer.style.display = "block";
+    clearTrackButtons();
+    audioTrackButtons.innerHTML = `<span class="track-empty">Detectando pistas...</span>`;
+    subtitleTrackButtons.innerHTML = "";
+
+    videoPlayer.src = streamUrl(file.id);
+    videoErrorLink.href = driveViewUrl(file.id);
+    videoPlayer.load();
+    videoPlayer.play().catch(() => {});
+
     modalOverlay.classList.add("open");
   }
 
+  // Si el usuario abrio una pelicula sin tener API Key, la reintentamos
+  // automaticamente despues de que la guarde
+  let pendingFile = null;
+  apiKeySave.addEventListener("click", () => {
+    if (getApiKey() && pendingFile) {
+      const f = pendingFile;
+      pendingFile = null;
+      openModal(f);
+    }
+  });
+
+  videoPlayer.addEventListener("loadedmetadata", buildTrackButtons);
+  videoPlayer.addEventListener("error", () => {
+    videoPlayer.style.display = "none";
+    videoError.style.display = "flex";
+  });
+
   function closeModal() {
     modalOverlay.classList.remove("open");
-    modalIframe.src = "";
+    videoPlayer.pause();
+    videoPlayer.removeAttribute("src");
+    videoPlayer.load();
+    clearTrackButtons();
   }
 
   modalClose.addEventListener("click", closeModal);
