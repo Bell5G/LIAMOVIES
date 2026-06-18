@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LiaMovies</title>
+<meta name="theme-color" content="#7c3aed" />
+<meta name="description" content="Las peliculas favoritas de mi araraws" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0614;
+    --bg-elevated: #15102a;
+    --bg-card: #1b1336;
+    --accent: #a855f7;
+    --accent2: #c084fc;
+    --accent-dim: #6d28d9;
+    --cream: #f3ecff;
+    --muted: #9c8fc0;
+    --line: #2e2350;
+    --focus: #c084fc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 12% -5%, rgba(168,85,247,0.22), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(192,132,252,0.12), transparent 40%),
+      linear-gradient(160deg, #0a0614 0%, #120a26 45%, #1a0f33 100%);
+    background-attachment: fixed;
+    color: var(--cream);
+    font-family: "Karla", -apple-system, sans-serif;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ============ HEADER ============ */
+  header {
+    padding: 40px 32px 24px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(180deg, var(--bg) 55%, rgba(10,6,20,0));
+    backdrop-filter: blur(10px);
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .brand h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 900;
+    font-size: 40px;
+    letter-spacing: -0.5px;
+    color: var(--cream);
+    position: relative;
+  }
+
+  .brand h1 .accent {
+    background: linear-gradient(100deg, var(--accent2) 0%, var(--accent) 60%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-style: italic;
+  }
+
+  .brand .ticket {
+    font-family: "Karla", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cream);
+    background: rgba(168,85,247,0.16);
+    border: 1px solid rgba(192,132,252,0.35);
+    padding: 4px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  header p.tagline {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+    font-family: "Fraunces", serif;
+  }
+
+  /* ============ CONTROLS ============ */
+  .controls {
+    display: flex;
+    gap: 12px;
+    padding: 0 32px 8px 32px;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 220px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    stroke: var(--muted);
+    pointer-events: none;
+  }
+
+  .controls input, .controls select {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    color: var(--cream);
+    padding: 11px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: "Karla", sans-serif;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .controls input { width: 100%; padding-left: 38px; }
+
+  .controls input::placeholder { color: var(--muted); }
+
+  .controls input:focus, .controls select:focus {
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px rgba(192,132,252,0.18);
+  }
+
+  .controls select { cursor: pointer; min-width: 190px; }
+
+  /* ============ STATUS ============ */
+  .status {
+    padding: 4px 32px 20px 32px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ============ GRID ============ */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 22px;
+    padding: 0 32px 64px 32px;
+  }
+
+  .card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    outline: none;
+    border-radius: 6px;
+  }
+
+  .card:focus-visible {
+    box-shadow: 0 0 0 3px var(--focus);
+  }
+
+  .card .thumb {
+    width: 100%;
+    aspect-ratio: 2/3;
+    background: var(--bg-card);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--line);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .card:hover .thumb, .card:focus-visible .thumb {
+    transform: translateY(-6px);
+    border-color: var(--accent2);
+    box-shadow: 0 18px 36px -10px rgba(124,58,237,0.45), 0 0 0 1px rgba(192,132,252,0.25);
+  }
+
+  .card .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .card .thumb .placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      repeating-linear-gradient(135deg, rgba(168,85,247,0.07) 0px, rgba(168,85,247,0.07) 2px, transparent 2px, transparent 14px);
+  }
+
+  .card .thumb .placeholder svg {
+    width: 36px;
+    height: 36px;
+    stroke: var(--accent-dim);
+    stroke-width: 1.4;
+  }
+
+  .card .thumb .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10,6,20,0.0);
+    opacity: 0;
+    transition: opacity 0.25s ease, background 0.25s ease;
+  }
+
+  .card:hover .play-overlay, .card:focus-visible .play-overlay {
+    opacity: 1;
+    background: rgba(10,6,20,0.45);
+  }
+
+  .play-overlay .play-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    box-shadow: 0 6px 20px rgba(168,85,247,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0.85);
+    transition: transform 0.25s ease;
+  }
+
+  .card:hover .play-circle, .card:focus-visible .play-circle {
+    transform: scale(1);
+  }
+
+  .play-circle svg {
+    width: 18px;
+    height: 18px;
+    fill: #0a0614;
+    stroke: none;
+    margin-left: 2px;
+  }
+
+  .card .info .title {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--cream);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+  }
+
+  .card:hover .info .title, .card:focus-visible .info .title {
+    color: var(--accent);
+  }
+
+  .card .info .meta {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ============ EMPTY STATE ============ */
+  .empty-state {
+    padding: 80px 32px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty-state .stub {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    border: 2px dashed var(--line);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .empty-state .stub svg {
+    width: 24px; height: 24px;
+    stroke: var(--accent-dim);
+  }
+  .empty-state p.lead {
+    font-family: "Fraunces", serif;
+    font-size: 18px;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+  .empty-state p.sub {
+    font-size: 13px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6,3,14,0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 920px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px -16px rgba(0,0,0,0.7);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .modal-header h2 {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--cream);
+    padding-right: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .modal-header .modal-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .modal-header button {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .modal-header button:hover, .modal-header button:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent-dim);
+  }
+  .modal-header button svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .modal-body {
+    position: relative;
+    width: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-body video {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: block;
+    background: #000;
+  }
+
+  .modal-body iframe {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: none;
+    display: block;
+    background: #000;
+  }
+
+  .compat-notice {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-style: italic;
+    width: 100%;
+  }
+
+  /* ============ TRACK CONTROLS (audio / subtitulos) ============ */
+  .track-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 14px 22px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--line);
+  }
+
+  .track-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .track-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .track-buttons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .track-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-family: "Karla", sans-serif;
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+
+  .track-btn:hover {
+    border-color: var(--accent-dim);
+    color: var(--cream);
+  }
+
+  .track-btn.active {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-color: var(--accent);
+    color: #0a0614;
+    font-weight: 700;
+    box-shadow: 0 2px 10px rgba(168,85,247,0.4);
+  }
+
+  .track-empty {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* En pantallas pequenas, la pelicula ocupa toda la pantalla */
+  @media (max-width: 720px) {
+    .modal-overlay {
+      padding: 0;
+    }
+    .modal {
+      max-width: 100%;
+      height: 100%;
+      border-radius: 0;
+      border: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      padding: 14px 16px;
+    }
+    .modal-body {
+      flex: 1;
+      height: auto;
+    }
+    .modal-body video,
+    .modal-body iframe {
+      aspect-ratio: auto;
+      flex: 1;
+      min-height: 0;
+    }
+  }
+
+  /* Cuando el video esta en fullscreen nativo */
+  .modal-body:fullscreen,
+  .modal-body video:fullscreen {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 560px) {
+    header { padding: 28px 18px 16px 18px; }
+    .brand h1 { font-size: 30px; }
+    .controls, .status, .grid { padding-left: 18px; padding-right: 18px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Lia<span class="accent">Movies</span></h1>
+    <span class="ticket">Funcion continua</span>
+  </div>
+  <p class="tagline">Peliculas Favoritas de mi araraws</p>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="Buscar en la cartelera..." />
+  </div>
+  <select id="sortSelect">
+    <option value="default">Orden: como las agregue</option>
+    <option value="name">Orden: titulo (A-Z)</option>
+    <option value="name-desc">Orden: titulo (Z-A)</option>
+  </select>
+</div>
+
+<div id="status" class="status"></div>
+<div id="grid" class="grid"></div>
+
+<!-- Modal de reproduccion -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Titulo</h2>
+      <div class="modal-actions">
+        <button id="modalFullscreen" aria-label="Pantalla completa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+        <button id="modalClose" aria-label="Cerrar">&times;</button>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <video id="videoPlayer" controls playsinline></video>
+      <iframe id="fallbackIframe" src="" allow="autoplay; fullscreen" allowfullscreen title="Reproductor de respaldo" style="display:none;"></iframe>
+      <div class="track-controls" id="trackControls">
+        <div class="track-group">
+          <span class="track-label">🔊 Audio</span>
+          <div id="audioTrackButtons" class="track-buttons"></div>
+        </div>
+        <div class="track-group">
+          <span class="track-label">💬 Subtitulos</span>
+          <div id="subtitleTrackButtons" class="track-buttons"></div>
+        </div>
+        <span id="compatNotice" class="compat-notice" style="display:none;">Modo compatibilidad: este archivo se reproduce vía Drive, sin selector de pistas.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ======================================================================
+  //  TU CARTELERA - Edita esta lista para agregar o quitar peliculas
+  // ======================================================================
+  //
+  //  Para cada pelicula necesitas el ID del archivo de Google Drive del VIDEO.
+  //  Lo sacas del enlace para compartir, que se ve asi:
+  //
+  //  https://drive.google.com/file/d/AQUI_VA_EL_ID/view?usp=sharing
+  //                                   ^^^^^^^^^^^^^
+  //                                   esa parte es el "id"
+  //
+  //  "subtitulo" es opcional (ej: año, genero). Si no quieres, deja "".
+  //
+  //  CARATULA (portada) - hay 2 formas:
+  //
+  //  1) AUTOMATICA (default si no pones "caratula"):
+  //     Se usa una miniatura generada por Google Drive del propio video.
+  //     No necesitas hacer nada, ya funciona asi.
+  //
+  //  2) PERSONALIZADA (recomendado si tienes tus propias imagenes de portada):
+  //     Sube la imagen de la caratula a Drive, compartila igual que el video,
+  //     y copia el ID de ESA imagen en el campo "caratula".
+  //     Ejemplo de campo: caratula: "1AbCDeFGhIJKlmnOPQrstUVwxyz"
+  //
+  // ======================================================================
+
+  const PELICULAS = [
+    {
+      titulo: "Aquamarine",
+      subtitulo: "2006",
+      id: "1LPI58Xw9w4xvyGcRennzUrpGhkoyr0aa",
+      caratula: "1k-pzcyuLtvUnRzMSRW5I13vS71jKsxAM"
+    },
+    {
+      titulo: "El Hobbit: Un Viaje Inesperado",
+      subtitulo: "Version Extendida",
+      id: "1qskD0sjdzXlQ4bivSMY7m-KnB7oCN9nn",
+      caratula: "1gTobZQBfGRNrWVQcfa20GFgNe0GLn4Aj"
+    }
+  ];
+
+  // ======================================================================
+  //  API KEY de Google Drive - ya configurada, no necesitas tocar esto.
+  //  Si alguna vez necesitas cambiarla, reemplaza el valor de abajo.
+  // ======================================================================
+  const API_KEY = "AIzaSyDoQv3CirDPkIVGLJBqynxtLDNuqE-mjRY";
+
+  // ======================================================================
+  //  No es necesario editar nada debajo de esta linea
+  // ======================================================================
+
+  const gridEl = document.getElementById("grid");
+  const statusEl = document.getElementById("status");
+  const searchInput = document.getElementById("searchInput");
+  const sortSelect = document.getElementById("sortSelect");
+  const modalOverlay = document.getElementById("modalOverlay");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalBody = document.getElementById("modalBody");
+  const modalClose = document.getElementById("modalClose");
+  const modalFullscreen = document.getElementById("modalFullscreen");
+  const videoPlayer = document.getElementById("videoPlayer");
+  const fallbackIframe = document.getElementById("fallbackIframe");
+  const compatNotice = document.getElementById("compatNotice");
+  const audioTrackButtons = document.getElementById("audioTrackButtons");
+  const subtitleTrackButtons = document.getElementById("subtitleTrackButtons");
+
+  function filmIconSvg() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="3" width="20" height="18" rx="2"/>
+      <line x1="7" y1="3" x2="7" y2="21"/>
+      <line x1="17" y1="3" x2="17" y2="21"/>
+      <line x1="2" y1="8" x2="7" y2="8"/>
+      <line x1="2" y1="14" x2="7" y2="14"/>
+      <line x1="17" y1="8" x2="22" y2="8"/>
+
+      <line x1="17" y1="14" x2="22" y2="14"/>
+    </svg>`;
+  }
+
+  function playIconSvg() {
+    return `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+  }
+
+  function emptyIconSvg() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>
+    </svg>`;
+  }
+
+  function thumbUrl(file) {
+    // Si hay una caratula personalizada, usa esa imagen.
+    // Si no, usa la miniatura automatica que genera Drive del video.
+    const imgId = (file.caratula && file.caratula.trim()) ? file.caratula.trim() : file.id;
+    return `https://drive.google.com/thumbnail?id=${imgId}&sz=w800`;
+  }
+
+  function renderGrid(files) {
+    gridEl.innerHTML = "";
+
+    if (files.length === 0) {
+      gridEl.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="stub">${emptyIconSvg()}</div>
+          <p class="lead">No hay funciones para esa busqueda</p>
+          <p class="sub">Proba con otro titulo.</p>
+        </div>`;
+      return;
+    }
+
+    files.forEach(file => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", `Reproducir ${file.titulo}`);
+
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+
+      const overlay = document.createElement("div");
+      overlay.className = "play-overlay";
+      overlay.innerHTML = `<div class="play-circle">${playIconSvg()}</div>`;
+
+      const img = document.createElement("img");
+      img.src = thumbUrl(file);
+      img.alt = "";
+      img.loading = "lazy";
+      img.onerror = function () {
+        thumb.innerHTML = `<div class="placeholder">${filmIconSvg()}</div>`;
+        thumb.appendChild(overlay);
+      };
+      thumb.appendChild(img);
+      thumb.appendChild(overlay);
+
+      const info = document.createElement("div");
+      info.className = "info";
+      const title = document.createElement("div");
+      title.className = "title";
+      title.textContent = file.titulo;
+      info.appendChild(title);
+
+      if (file.subtitulo) {
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = file.subtitulo;
+        info.appendChild(meta);
+      }
+
+      card.appendChild(thumb);
+      card.appendChild(info);
+
+      card.addEventListener("click", () => openModal(file));
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModal(file);
+        }
+      });
+
+      gridEl.appendChild(card);
+    });
+  }
+
+  function applyFiltersAndSort() {
+    let result = [...PELICULAS];
+
+    const query = searchInput.value.trim().toLowerCase();
+    if (query) {
+      result = result.filter(f => f.titulo.toLowerCase().includes(query));
+    }
+
+    const sortBy = sortSelect.value;
+    if (sortBy === "name") {
+      result.sort((a, b) => a.titulo.localeCompare(b.titulo));
+    } else if (sortBy === "name-desc") {
+      result.sort((a, b) => b.titulo.localeCompare(a.titulo));
+    }
+
+    renderGrid(result);
+  }
+
+  function streamUrl(fileId) {
+    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
+  }
+
+  function driveEmbedUrl(fileId) {
+    return `https://drive.google.com/file/d/${fileId}/preview`;
+  }
+
+  function clearTrackButtons() {
+    audioTrackButtons.innerHTML = "";
+    subtitleTrackButtons.innerHTML = "";
+  }
+
+  // Construye los botones de audio/subtitulos a partir de las pistas
+  // que el propio navegador detecto dentro del archivo .mkv/.mp4
+  function buildTrackButtons() {
+    clearTrackButtons();
+
+    // --- Pistas de AUDIO ---
+    const audioTracks = videoPlayer.audioTracks;
+    if (audioTracks && audioTracks.length > 1) {
+      for (let i = 0; i < audioTracks.length; i++) {
+        const t = audioTracks[i];
+        const btn = document.createElement("button");
+        btn.className = "track-btn" + (t.enabled ? " active" : "");
+        btn.textContent = t.label || t.language || `Pista ${i + 1}`;
+        btn.addEventListener("click", () => {
+          for (let j = 0; j < audioTracks.length; j++) {
+            audioTracks[j].enabled = (j === i);
+          }
+          Array.from(audioTrackButtons.children).forEach((b, idx) => {
+            b.classList.toggle("active", idx === i);
+          });
+        });
+        audioTrackButtons.appendChild(btn);
+      }
+    } else {
+      audioTrackButtons.innerHTML = `<span class="track-empty">Tu navegador no expone varias pistas de audio para este archivo</span>`;
+    }
+
+    // --- Pistas de SUBTITULOS ---
+    const textTracks = videoPlayer.textTracks;
+    if (textTracks && textTracks.length > 0) {
+      const offBtn = document.createElement("button");
+      offBtn.className = "track-btn active";
+      offBtn.textContent = "Desactivados";
+      offBtn.addEventListener("click", () => {
+        for (let i = 0; i < textTracks.length; i++) textTracks[i].mode = "disabled";
+        Array.from(subtitleTrackButtons.children).forEach(b => b.classList.remove("active"));
+        offBtn.classList.add("active");
+      });
+      subtitleTrackButtons.appendChild(offBtn);
+
+      for (let i = 0; i < textTracks.length; i++) {
+        const t = textTracks[i];
+        t.mode = "disabled";
+        const btn = document.createElement("button");
+        btn.className = "track-btn";
+        btn.textContent = t.label || t.language || `Subtitulo ${i + 1}`;
+        btn.addEventListener("click", () => {
+          for (let j = 0; j < textTracks.length; j++) {
+            textTracks[j].mode = (j === i) ? "showing" : "disabled";
+          }
+          Array.from(subtitleTrackButtons.children).forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+        });
+        subtitleTrackButtons.appendChild(btn);
+      }
+    } else {
+      subtitleTrackButtons.innerHTML = `<span class="track-empty">Tu navegador no expone subtitulos para este archivo</span>`;
+    }
+  }
+
+  // Si el video directo no carga (codec no soportado por el navegador,
+  // tipico de algunos .avi viejos), caemos automaticamente al reproductor
+  // embebido de Google Drive, que transcodifica en el servidor.
+  function fallbackToIframe(file) {
+    videoPlayer.pause();
+    videoPlayer.style.display = "none";
+    videoPlayer.removeAttribute("src");
+    videoPlayer.load();
+
+    fallbackIframe.src = driveEmbedUrl(file.id);
+    fallbackIframe.style.display = "block";
+
+    clearTrackButtons();
+    audioTrackButtons.innerHTML = `<span class="track-empty">No disponible en modo compatibilidad</span>`;
+    subtitleTrackButtons.innerHTML = "";
+    compatNotice.style.display = "block";
+  }
+
+  function openModal(file) {
+    modalTitle.textContent = file.titulo;
+
+    // Reset de estado visual
+    compatNotice.style.display = "none";
+    fallbackIframe.style.display = "none";
+    fallbackIframe.src = "";
+    videoPlayer.style.display = "block";
+    clearTrackButtons();
+    audioTrackButtons.innerHTML = `<span class="track-empty">Detectando pistas...</span>`;
+    subtitleTrackButtons.innerHTML = "";
+
+    videoPlayer.src = streamUrl(file.id);
+    videoPlayer.load();
+    videoPlayer.play().catch(() => {});
+
+    // Guardamos referencia a la pelicula actual para el fallback
+    videoPlayer.dataset.currentFile = file.id;
+
+    modalOverlay.classList.add("open");
+  }
+
+  videoPlayer.addEventListener("loadedmetadata", buildTrackButtons);
+  videoPlayer.addEventListener("error", () => {
+    const currentId = videoPlayer.dataset.currentFile;
+    const file = PELICULAS.find(f => f.id === currentId);
+    if (file) fallbackToIframe(file);
+  });
+
+  function closeModal() {
+    modalOverlay.classList.remove("open");
+    videoPlayer.pause();
+    videoPlayer.removeAttribute("src");
+    videoPlayer.load();
+    fallbackIframe.src = "";
+    fallbackIframe.style.display = "none";
+    clearTrackButtons();
+  }
+
+  modalClose.addEventListener("click", closeModal);
+  modalFullscreen.addEventListener("click", () => {
+    if (modalBody.requestFullscreen) {
+      modalBody.requestFullscreen();
+    } else if (modalBody.webkitRequestFullscreen) {
+      modalBody.webkitRequestFullscreen();
+    }
+  });
+  modalOverlay.addEventListener("click", (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modalOverlay.classList.contains("open")) closeModal();
+  });
+
+  searchInput.addEventListener("input", applyFiltersAndSort);
+  sortSelect.addEventListener("change", applyFiltersAndSort);
+
+  const plural = PELICULAS.length === 1 ? "pelicula en cartelera" : "peliculas en cartelera";
+  statusEl.textContent = `${PELICULAS.length} ${plural}`;
+
+  applyFiltersAndSort();
+
+  // ============ PWA: registrar el service worker ============
+  // Esto permite instalar LiaMovies como app y que la "carcasa"
+  // (HTML, estilos, iconos) cargue rapido. Los videos siguen
+  // viniendo siempre de Google Drive, nunca se cachean.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {
+        // Si falla (ej: abierto como archivo local sin servidor), no pasa nada,
+        // la app sigue funcionando normal en el navegador.
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
