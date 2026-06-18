@@ -482,7 +482,7 @@
   //  TU CARTELERA - Edita esta lista para agregar o quitar peliculas
   // ======================================================================
   //
-  //  Para cada pelicula necesitas el ID del archivo de Google Drive.
+  //  Para cada pelicula necesitas el ID del archivo de Google Drive del VIDEO.
   //  Lo sacas del enlace para compartir, que se ve asi:
   //
   //  https://drive.google.com/file/d/AQUI_VA_EL_ID/view?usp=sharing
@@ -490,13 +490,32 @@
   //                                   esa parte es el "id"
   //
   //  "subtitulo" es opcional (ej: año, genero). Si no quieres, deja "".
+  //
+  //  CARATULA (portada) - hay 2 formas:
+  //
+  //  1) AUTOMATICA (default si no pones "caratula"):
+  //     Se usa una miniatura generada por Google Drive del propio video.
+  //     No necesitas hacer nada, ya funciona asi.
+  //
+  //  2) PERSONALIZADA (recomendado si tienes tus propias imagenes de portada):
+  //     Sube la imagen de la caratula a Drive, compartila igual que el video,
+  //     y copia el ID de ESA imagen en el campo "caratula".
+  //     Ejemplo de campo: caratula: "1AbCDeFGhIJKlmnOPQrstUVwxyz"
+  //
   // ======================================================================
 
   const PELICULAS = [
     {
       titulo: "Aquamarine",
       subtitulo: "2006",
-      id: "1LPI58Xw9w4xvyGcRennzUrpGhkoyr0aa"
+      id: "1LPI58Xw9w4xvyGcRennzUrpGhkoyr0aa",
+      caratula: "1k-pzcyuLtvUnRzMSRW5I13vS71jKsxAM"
+    },
+    {
+      titulo: "El Hobbit: Un Viaje Inesperado",
+      subtitulo: "Version Extendida",
+      id: "1qskD0sjdzXlQ4bivSMY7m-KnB7oCN9nn",
+      caratula: "1gTobZQBfGRNrWVQcfa20GFgNe0GLn4Aj"
     }
   ];
 
@@ -538,8 +557,10 @@
   }
 
   function thumbUrl(file) {
-    // Miniatura automatica de Google Drive en mayor resolucion
-    return `https://drive.google.com/thumbnail?id=${file.id}&sz=w800`;
+    // Si hay una caratula personalizada, usa esa imagen.
+    // Si no, usa la miniatura automatica que genera Drive del video.
+    const imgId = (file.caratula && file.caratula.trim()) ? file.caratula.trim() : file.id;
+    return `https://drive.google.com/thumbnail?id=${imgId}&sz=w800`;
   }
 
   function renderGrid(files) {
