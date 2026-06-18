@@ -4,20 +4,26 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LiaMovies</title>
+<meta name="theme-color" content="#7c3aed" />
+<meta name="description" content="Las peliculas favoritas de mi araraws" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" href="icon-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #15110f;
-    --bg-elevated: #1f1916;
-    --bg-card: #221b18;
-    --film: #e8b14a;
-    --film-dim: #a37c33;
-    --cream: #f3ecdf;
-    --muted: #b8a99a;
-    --line: #3a2f29;
-    --focus: #e8b14a;
+    --bg: #0a0614;
+    --bg-elevated: #15102a;
+    --bg-card: #1b1336;
+    --accent: #a855f7;
+    --accent2: #c084fc;
+    --accent-dim: #6d28d9;
+    --cream: #f3ecff;
+    --muted: #9c8fc0;
+    --line: #2e2350;
+    --focus: #c084fc;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,8 +33,10 @@
   body {
     background: var(--bg);
     background-image:
-      radial-gradient(circle at 15% 0%, rgba(232,177,74,0.06), transparent 40%),
-      radial-gradient(circle at 85% 20%, rgba(232,177,74,0.04), transparent 35%);
+      radial-gradient(circle at 12% -5%, rgba(168,85,247,0.22), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(192,132,252,0.12), transparent 40%),
+      linear-gradient(160deg, #0a0614 0%, #120a26 45%, #1a0f33 100%);
+    background-attachment: fixed;
     color: var(--cream);
     font-family: "Karla", -apple-system, sans-serif;
     min-height: 100vh;
@@ -41,8 +49,8 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: linear-gradient(180deg, var(--bg) 60%, rgba(21,17,15,0));
-    backdrop-filter: blur(8px);
+    background: linear-gradient(180deg, var(--bg) 55%, rgba(10,6,20,0));
+    backdrop-filter: blur(10px);
   }
 
   .brand {
@@ -54,15 +62,18 @@
 
   .brand h1 {
     font-family: "Fraunces", serif;
-    font-weight: 700;
+    font-weight: 900;
     font-size: 40px;
-    letter-spacing: 0.5px;
+    letter-spacing: -0.5px;
     color: var(--cream);
     position: relative;
   }
 
   .brand h1 .accent {
-    color: var(--film);
+    background: linear-gradient(100deg, var(--accent2) 0%, var(--accent) 60%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     font-style: italic;
   }
 
@@ -72,11 +83,11 @@
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--bg);
-    background: var(--film);
-    padding: 4px 10px;
-    border-radius: 3px;
-    transform: rotate(-2deg);
+    color: var(--cream);
+    background: rgba(168,85,247,0.16);
+    border: 1px solid rgba(192,132,252,0.35);
+    padding: 4px 11px;
+    border-radius: 20px;
     white-space: nowrap;
   }
 
@@ -131,7 +142,7 @@
 
   .controls input:focus, .controls select:focus {
     border-color: var(--focus);
-    box-shadow: 0 0 0 3px rgba(232,177,74,0.15);
+    box-shadow: 0 0 0 3px rgba(192,132,252,0.18);
   }
 
   .controls select { cursor: pointer; min-width: 190px; }
@@ -168,7 +179,7 @@
     width: 100%;
     aspect-ratio: 2/3;
     background: var(--bg-card);
-    border-radius: 6px;
+    border-radius: 10px;
     overflow: hidden;
     position: relative;
     border: 1px solid var(--line);
@@ -177,8 +188,8 @@
 
   .card:hover .thumb, .card:focus-visible .thumb {
     transform: translateY(-6px);
-    border-color: var(--film-dim);
-    box-shadow: 0 16px 32px -12px rgba(0,0,0,0.6);
+    border-color: var(--accent2);
+    box-shadow: 0 18px 36px -10px rgba(124,58,237,0.45), 0 0 0 1px rgba(192,132,252,0.25);
   }
 
   .card .thumb img {
@@ -195,13 +206,13 @@
     align-items: center;
     justify-content: center;
     background:
-      repeating-linear-gradient(135deg, rgba(232,177,74,0.04) 0px, rgba(232,177,74,0.04) 2px, transparent 2px, transparent 14px);
+      repeating-linear-gradient(135deg, rgba(168,85,247,0.07) 0px, rgba(168,85,247,0.07) 2px, transparent 2px, transparent 14px);
   }
 
   .card .thumb .placeholder svg {
     width: 36px;
     height: 36px;
-    stroke: var(--film-dim);
+    stroke: var(--accent-dim);
     stroke-width: 1.4;
   }
 
@@ -211,21 +222,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(21,17,15,0.0);
+    background: rgba(10,6,20,0.0);
     opacity: 0;
     transition: opacity 0.25s ease, background 0.25s ease;
   }
 
   .card:hover .play-overlay, .card:focus-visible .play-overlay {
     opacity: 1;
-    background: rgba(21,17,15,0.35);
+    background: rgba(10,6,20,0.45);
   }
 
   .play-overlay .play-circle {
     width: 46px;
     height: 46px;
     border-radius: 50%;
-    background: var(--film);
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    box-shadow: 0 6px 20px rgba(168,85,247,0.55);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -240,7 +252,7 @@
   .play-circle svg {
     width: 18px;
     height: 18px;
-    fill: var(--bg);
+    fill: #0a0614;
     stroke: none;
     margin-left: 2px;
   }
@@ -257,7 +269,7 @@
   }
 
   .card:hover .info .title, .card:focus-visible .info .title {
-    color: var(--film);
+    color: var(--accent);
   }
 
   .card .info .meta {
@@ -283,7 +295,7 @@
   }
   .empty-state .stub svg {
     width: 24px; height: 24px;
-    stroke: var(--film-dim);
+    stroke: var(--accent-dim);
   }
   .empty-state p.lead {
     font-family: "Fraunces", serif;
@@ -301,7 +313,7 @@
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(10,8,6,0.92);
+    background: rgba(6,3,14,0.92);
     display: none;
     align-items: center;
     justify-content: center;
@@ -367,8 +379,8 @@
     transition: color 0.15s ease, border-color 0.15s ease;
   }
   .modal-header button:hover, .modal-header button:focus-visible {
-    color: var(--film);
-    border-color: var(--film-dim);
+    color: var(--accent);
+    border-color: var(--accent-dim);
   }
   .modal-header button svg {
     width: 17px;
@@ -389,31 +401,19 @@
     background: #000;
   }
 
-  .video-error {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    text-align: center;
-    padding: 24px;
+  .modal-body iframe {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: none;
+    display: block;
     background: #000;
   }
-  .video-error p {
+
+  .compat-notice {
+    font-size: 11.5px;
     color: var(--muted);
-    font-size: 14px;
-    max-width: 360px;
-  }
-  .video-error a {
-    color: var(--bg);
-    background: var(--film);
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 13px;
-    padding: 9px 18px;
-    border-radius: 6px;
+    font-style: italic;
+    width: 100%;
   }
 
   /* ============ TRACK CONTROLS (audio / subtitulos) ============ */
@@ -461,15 +461,16 @@
   }
 
   .track-btn:hover {
-    border-color: var(--film-dim);
+    border-color: var(--accent-dim);
     color: var(--cream);
   }
 
   .track-btn.active {
-    background: var(--film);
-    border-color: var(--film);
-    color: var(--bg);
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-color: var(--accent);
+    color: #0a0614;
     font-weight: 700;
+    box-shadow: 0 2px 10px rgba(168,85,247,0.4);
   }
 
   .track-empty {
@@ -477,77 +478,6 @@
     color: var(--muted);
     font-style: italic;
   }
-
-  /* ============ API KEY MODAL ============ */
-  .apikey-modal {
-    max-width: 460px;
-  }
-
-  .apikey-body {
-    padding: 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .apikey-body p {
-    font-size: 13.5px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .apikey-body input {
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    color: var(--cream);
-    padding: 11px 14px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: "Karla", sans-serif;
-    outline: none;
-    width: 100%;
-    transition: border-color 0.15s ease;
-  }
-
-  .apikey-body input:focus {
-    border-color: var(--focus);
-    box-shadow: 0 0 0 3px rgba(232,177,74,0.15);
-  }
-
-  .apikey-error {
-    font-size: 12.5px;
-    color: #e0735c;
-    display: none;
-  }
-
-  .apikey-btn {
-    background: var(--film);
-    color: var(--bg);
-    border: none;
-    font-family: "Karla", sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 11px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: opacity 0.15s ease;
-  }
-
-  .apikey-btn:hover {
-    opacity: 0.88;
-  }
-
-  .apikey-link {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 12.5px;
-    text-decoration: underline;
-    cursor: pointer;
-    text-align: left;
-    padding: 0;
-  }
-  .apikey-link:hover { color: var(--film); }
 
   /* En pantallas pequenas, la pelicula ocupa toda la pantalla */
   @media (max-width: 720px) {
@@ -569,7 +499,8 @@
       flex: 1;
       height: auto;
     }
-    .modal-body video {
+    .modal-body video,
+    .modal-body iframe {
       aspect-ratio: auto;
       flex: 1;
       min-height: 0;
@@ -607,7 +538,6 @@
     <span class="ticket">Funcion continua</span>
   </div>
   <p class="tagline">Peliculas Favoritas de mi araraws</p>
-  <button id="changeApiKeyBtn" class="apikey-link" style="margin-top:8px;">⚙️ Cambiar API Key</button>
 </header>
 
 <div class="controls">
@@ -625,21 +555,6 @@
 <div id="status" class="status"></div>
 <div id="grid" class="grid"></div>
 
-<!-- Modal: pedir API Key (solo aparece la primera vez) -->
-<div class="modal-overlay" id="apiKeyOverlay">
-  <div class="modal apikey-modal">
-    <div class="modal-header">
-      <h2>Conecta tu API Key de Google</h2>
-    </div>
-    <div class="apikey-body">
-      <p>Para reproducir con selector de audio y subtitulos, LiaMovies necesita tu API Key de Google Drive. Se guarda solo en este navegador, nunca se sube a ningun lado.</p>
-      <input type="password" id="apiKeyInput" placeholder="Pega aqui tu API Key (AIza...)" autocomplete="off" />
-      <div id="apiKeyError" class="apikey-error"></div>
-      <button id="apiKeySave" class="apikey-btn">Guardar y continuar</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal de reproduccion -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
@@ -654,6 +569,7 @@
     </div>
     <div class="modal-body" id="modalBody">
       <video id="videoPlayer" controls playsinline></video>
+      <iframe id="fallbackIframe" src="" allow="autoplay; fullscreen" allowfullscreen title="Reproductor de respaldo" style="display:none;"></iframe>
       <div class="track-controls" id="trackControls">
         <div class="track-group">
           <span class="track-label">🔊 Audio</span>
@@ -663,10 +579,7 @@
           <span class="track-label">💬 Subtitulos</span>
           <div id="subtitleTrackButtons" class="track-buttons"></div>
         </div>
-      </div>
-      <div id="videoError" class="video-error" style="display:none;">
-        <p>No se pudo cargar este video directamente (puede ser un .mkv no compatible con tu navegador).</p>
-        <a id="videoErrorLink" href="#" target="_blank">Abrir en Google Drive</a>
+        <span id="compatNotice" class="compat-notice" style="display:none;">Modo compatibilidad: este archivo se reproduce vía Drive, sin selector de pistas.</span>
       </div>
     </div>
   </div>
@@ -715,6 +628,12 @@
   ];
 
   // ======================================================================
+  //  API KEY de Google Drive - ya configurada, no necesitas tocar esto.
+  //  Si alguna vez necesitas cambiarla, reemplaza el valor de abajo.
+  // ======================================================================
+  const API_KEY = "AIzaSyDoQv3CirDPkIVGLJBqynxtLDNuqE-mjRY";
+
+  // ======================================================================
   //  No es necesario editar nada debajo de esta linea
   // ======================================================================
 
@@ -728,48 +647,10 @@
   const modalClose = document.getElementById("modalClose");
   const modalFullscreen = document.getElementById("modalFullscreen");
   const videoPlayer = document.getElementById("videoPlayer");
-  const videoError = document.getElementById("videoError");
-  const videoErrorLink = document.getElementById("videoErrorLink");
+  const fallbackIframe = document.getElementById("fallbackIframe");
+  const compatNotice = document.getElementById("compatNotice");
   const audioTrackButtons = document.getElementById("audioTrackButtons");
   const subtitleTrackButtons = document.getElementById("subtitleTrackButtons");
-
-  const apiKeyOverlay = document.getElementById("apiKeyOverlay");
-  const apiKeyInput = document.getElementById("apiKeyInput");
-  const apiKeySave = document.getElementById("apiKeySave");
-  const apiKeyError = document.getElementById("apiKeyError");
-
-  // ============ API KEY: guardar / leer del navegador ============
-  function getApiKey() {
-    return localStorage.getItem("liamovies_api_key") || "";
-  }
-  function setApiKey(key) {
-    localStorage.setItem("liamovies_api_key", key);
-  }
-
-  function showApiKeyModal() {
-    apiKeyInput.value = getApiKey();
-    apiKeyError.style.display = "none";
-    apiKeyOverlay.classList.add("open");
-  }
-  function hideApiKeyModal() {
-    apiKeyOverlay.classList.remove("open");
-  }
-
-  apiKeySave.addEventListener("click", () => {
-    const val = apiKeyInput.value.trim();
-    if (!val) {
-      apiKeyError.textContent = "Pega tu API Key para continuar.";
-      apiKeyError.style.display = "block";
-      return;
-    }
-    setApiKey(val);
-    hideApiKeyModal();
-  });
-  apiKeyInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") apiKeySave.click();
-  });
-
-  document.getElementById("changeApiKeyBtn").addEventListener("click", showApiKeyModal);
 
   function filmIconSvg() {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -887,12 +768,11 @@
   }
 
   function streamUrl(fileId) {
-    const key = getApiKey();
-    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${key}`;
+    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
   }
 
-  function driveViewUrl(fileId) {
-    return `https://drive.google.com/file/d/${fileId}/view`;
+  function driveEmbedUrl(fileId) {
+    return `https://drive.google.com/file/d/${fileId}/preview`;
   }
 
   function clearTrackButtons() {
@@ -960,43 +840,51 @@
     }
   }
 
-  function openModal(file) {
-    if (!getApiKey()) {
-      showApiKeyModal();
-      pendingFile = file;
-      return;
-    }
+  // Si el video directo no carga (codec no soportado por el navegador,
+  // tipico de algunos .avi viejos), caemos automaticamente al reproductor
+  // embebido de Google Drive, que transcodifica en el servidor.
+  function fallbackToIframe(file) {
+    videoPlayer.pause();
+    videoPlayer.style.display = "none";
+    videoPlayer.removeAttribute("src");
+    videoPlayer.load();
 
+    fallbackIframe.src = driveEmbedUrl(file.id);
+    fallbackIframe.style.display = "block";
+
+    clearTrackButtons();
+    audioTrackButtons.innerHTML = `<span class="track-empty">No disponible en modo compatibilidad</span>`;
+    subtitleTrackButtons.innerHTML = "";
+    compatNotice.style.display = "block";
+  }
+
+  function openModal(file) {
     modalTitle.textContent = file.titulo;
-    videoError.style.display = "none";
+
+    // Reset de estado visual
+    compatNotice.style.display = "none";
+    fallbackIframe.style.display = "none";
+    fallbackIframe.src = "";
     videoPlayer.style.display = "block";
     clearTrackButtons();
     audioTrackButtons.innerHTML = `<span class="track-empty">Detectando pistas...</span>`;
     subtitleTrackButtons.innerHTML = "";
 
     videoPlayer.src = streamUrl(file.id);
-    videoErrorLink.href = driveViewUrl(file.id);
     videoPlayer.load();
     videoPlayer.play().catch(() => {});
+
+    // Guardamos referencia a la pelicula actual para el fallback
+    videoPlayer.dataset.currentFile = file.id;
 
     modalOverlay.classList.add("open");
   }
 
-  // Si el usuario abrio una pelicula sin tener API Key, la reintentamos
-  // automaticamente despues de que la guarde
-  let pendingFile = null;
-  apiKeySave.addEventListener("click", () => {
-    if (getApiKey() && pendingFile) {
-      const f = pendingFile;
-      pendingFile = null;
-      openModal(f);
-    }
-  });
-
   videoPlayer.addEventListener("loadedmetadata", buildTrackButtons);
   videoPlayer.addEventListener("error", () => {
-    videoPlayer.style.display = "none";
-    videoError.style.display = "flex";
+    const currentId = videoPlayer.dataset.currentFile;
+    const file = PELICULAS.find(f => f.id === currentId);
+    if (file) fallbackToIframe(file);
   });
 
   function closeModal() {
@@ -1004,6 +892,8 @@
     videoPlayer.pause();
     videoPlayer.removeAttribute("src");
     videoPlayer.load();
+    fallbackIframe.src = "";
+    fallbackIframe.style.display = "none";
     clearTrackButtons();
   }
 
@@ -1029,6 +919,19 @@
   statusEl.textContent = `${PELICULAS.length} ${plural}`;
 
   applyFiltersAndSort();
+
+  // ============ PWA: registrar el service worker ============
+  // Esto permite instalar LiaMovies como app y que la "carcasa"
+  // (HTML, estilos, iconos) cargue rapido. Los videos siguen
+  // viniendo siempre de Google Drive, nunca se cachean.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {
+        // Si falla (ej: abierto como archivo local sin servidor), no pasa nada,
+        // la app sigue funcionando normal en el navegador.
+      });
+    });
+  }
 </script>
 
 </body>
